@@ -1,0 +1,24 @@
+{
+  "name": "my-electron-app",
+  "version": "1.0.0",
+  "description": "test app shared db",
+  "homepage": "https://github.com/bincani/my-electron-app#readme",
+  "bugs": {
+    "url": "https://github.com/bincani/my-electron-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bincani/my-electron-app.git"
+  },
+  "license": "ISC",
+  "author": "Ben Incani <ben.incani@gmail.com>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1"
+  }
+}
