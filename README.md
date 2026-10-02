@@ -47,6 +47,8 @@ To connect from another machine, allow the port through Windows Firewall
 New-NetFirewallRule -DisplayName "Chat server" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow
 ```
 
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a two-PC + Yodeck LAN setup.
+
 ### Admin page
 
 Open `http://localhost:8080/admin` on the server PC to see everyone who has
