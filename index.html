@@ -4,18 +4,35 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
+      content="default-src 'self'; script-src 'self'; connect-src ws: wss:"
     />
     <meta
       http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
+      content="default-src 'self'; script-src 'self'; connect-src ws: wss:"
     />
-    <title>Hello from Electron renderer!</title>
+    <title>Chat</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
-    <p id="info"></p>
+    <form id="login">
+      <input id="username" placeholder="Your name" required maxlength="32" autofocus />
+      <button>Join</button>
+    </form>
+
+    <main id="chat" hidden>
+      <aside>
+        <h3>Online</h3>
+        <ul id="users"></ul>
+      </aside>
+      <section>
+        <ul id="messages"></ul>
+        <form id="composer">
+          <input id="body" placeholder="Type a message" autocomplete="off" maxlength="2000" />
+          <button>Send</button>
+        </form>
+      </section>
+    </main>
+    <p id="status"></p>
   </body>
   <script src="./renderer.js"></script>
 </html>

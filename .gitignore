@@ -147,3 +147,8 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+# Chat database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
