@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; connect-src 'self'"
+    />
+    <title>Chat admin</title>
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Chat admin</h1>
+      <button id="refresh">Refresh</button>
+    </header>
+    <main>
+      <table id="users">
+        <thead>
+          <tr><th>User</th><th>Messages</th><th>Logins</th><th>Last seen</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <section id="history">
+        <h2 id="history-title">Select a user to see their messages</h2>
+        <ul id="messages"></ul>
+      </section>
+    </main>
+  </body>
+  <script src="./admin.js"></script>
+</html>

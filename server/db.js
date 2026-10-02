@@ -38,6 +38,21 @@ function openDb(file = process.env.CHAT_DB || 'chat.db') {
     recentMessages: db.prepare(
       'SELECT * FROM (SELECT * FROM messages ORDER BY id DESC LIMIT ?) ORDER BY id'
     ),
+    // One row per username: how often they joined, when, and how much they said.
+    userSummary: db.prepare(`
+      SELECT c.username,
+             COUNT(*) AS sessions,
+             MIN(c.connected_at) AS first_seen,
+             MAX(c.connected_at) AS last_seen,
+             SUM(c.disconnected_at IS NULL) > 0 AS online,
+             (SELECT COUNT(*) FROM messages m WHERE m.username = c.username) AS messages
+      FROM connections c
+      GROUP BY c.username
+      ORDER BY online DESC, last_seen DESC
+    `),
+    userMessages: db.prepare(
+      'SELECT id, body, created_at FROM messages WHERE username = ? ORDER BY id'
+    ),
   };
 
   return {
@@ -48,6 +63,9 @@ function openDb(file = process.env.CHAT_DB || 'chat.db') {
     addMessage: (connectionId, username, body) =>
       stmts.addMessage.get(connectionId, username, body),
     recentMessages: (limit = 50) => stmts.recentMessages.all(limit),
+    userSummary: () =>
+      stmts.userSummary.all().map((u) => ({ ...u, online: Boolean(u.online) })),
+    userMessages: (username) => stmts.userMessages.all(username),
     close: () => db.close(),
   };
 }
