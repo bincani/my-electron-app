@@ -1,0 +1,23 @@
+body { font-family: system-ui, sans-serif; margin: 0; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid #ddd; }
+h1 { font-size: 1.2em; margin: 0; }
+h2 { font-size: 1em; margin: 0 0 8px; }
+main { display: flex; gap: 16px; padding: 16px; align-items: flex-start; }
+table { border-collapse: collapse; min-width: 320px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #eee; }
+th { font-size: 0.85em; color: #666; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: #f5f5f5; }
+tbody tr.selected { background: #e6f0ff; }
+td.online { white-space: nowrap; }
+td.online::after { content: ' ●'; color: #2a2; }
+#history { flex: 1; min-width: 0; }
+#messages { list-style: none; margin: 0; padding: 0; }
+#messages li { padding: 6px 0; border-bottom: 1px solid #eee; overflow-wrap: anywhere; }
+#messages time { display: block; color: #999; font-size: 0.75em; }
+button { font: inherit; padding: 6px 10px; }
+
+@media (max-width: 700px) {
+  main { flex-direction: column; }
+  table, #history { width: 100%; min-width: 0; }
+}

@@ -47,6 +47,22 @@ To connect from another machine, allow the port through Windows Firewall
 New-NetFirewallRule -DisplayName "Chat server" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow
 ```
 
+### Admin page
+
+Open `http://localhost:8080/admin` on the server PC to see everyone who has
+joined: their message count, number of logins and when they were last seen
+(a green dot means online now). Click a user to see their message history.
+
+From other devices, set an admin password before starting the server. The
+browser then asks for it (the username can be anything):
+
+```powershell
+$env:ADMIN_PASSWORD = "choose-a-password"; npm run server
+```
+
+Users are grouped by the name they typed when joining, since there are no
+accounts. Two people using the same name show up as one user.
+
 ### From a phone or any browser
 
 The server also serves the chat page, so you can open `http://<server-ip>:8080`

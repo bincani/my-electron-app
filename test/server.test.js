@@ -63,3 +63,35 @@ test('stores connections and pushes chat to all connected clients', async (t) =>
   assert.strictEqual(welcome.history.at(-1).body, 'hi bob');
 
 });
+
+test('admin API summarises users and their messages, behind a password', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'chat-'));
+  const server = startServer({ port: 0, dbFile: path.join(dir, 'test.db'), adminPassword: 'secret' });
+  t.after(() => server.close());
+  await server.listening;
+  const port = server.port();
+  const base = `http://localhost:${port}`;
+
+  const alice = client(port, 'alice');
+  await alice.next('welcome');
+  alice.send(JSON.stringify({ type: 'chat', body: 'one' }));
+  await alice.next('chat');
+  alice.send(JSON.stringify({ type: 'chat', body: 'two' }));
+  await alice.next('chat');
+  const bob = client(port, 'bob');
+  await bob.next('welcome');
+
+  assert.strictEqual((await fetch(`${base}/api/admin/users`)).status, 401);
+  assert.strictEqual((await fetch(`${base}/admin`)).status, 401);
+
+  const auth = { headers: { Authorization: 'Basic ' + Buffer.from('admin:secret').toString('base64') } };
+  const users = await (await fetch(`${base}/api/admin/users`, auth)).json();
+  const byName = Object.fromEntries(users.map((u) => [u.username, u]));
+  assert.strictEqual(byName.alice.messages, 2);
+  assert.strictEqual(byName.bob.messages, 0);
+  assert.strictEqual(byName.bob.online, true);
+
+  const messages = await (await fetch(`${base}/api/admin/users/alice/messages`, auth)).json();
+  assert.deepStrictEqual(messages.map((m) => m.body), ['one', 'two']);
+  assert.strictEqual((await fetch(`${base}/admin`, auth)).status, 200);
+});
