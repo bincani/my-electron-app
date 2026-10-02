@@ -28,7 +28,7 @@ connect to it over TCP/IP.
 
 ```powershell
 npm install
-npm run server   # listens on ws://0.0.0.0:8080, stores data in .\chat.db
+npm run server   # listens on port 8080, stores data in .\chat.db
 npm start        # launch a client; start it again for a second instance
 npm test
 ```
@@ -40,4 +40,25 @@ $env:PORT = "9000"; $env:CHAT_DB = "C:\data\chat.db"; npm run server
 $env:CHAT_SERVER_URL = "ws://192.168.1.20:9000"; npm start
 ```
 
-To connect from another machine, allow the port through Windows Firewall.
+To connect from another machine, allow the port through Windows Firewall
+(run PowerShell as Administrator):
+
+```powershell
+New-NetFirewallRule -DisplayName "Chat server" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow
+```
+
+### From a phone or any browser
+
+The server also serves the chat page, so you can open `http://<server-ip>:8080`
+in a browser instead of running the Electron app.
+
+Over the internet, the simplest option is [Tailscale](https://tailscale.com):
+install it on the server PC and on your phone, signed in to the same account,
+then browse to `http://<server's Tailscale IP>:8080` (for example
+`http://100.127.83.8:8080`). Your router needs no changes and the server isn't
+exposed publicly.
+
+To share it with people who aren't on your Tailscale network, run
+`tailscale funnel 8080`. That publishes the chat at a public
+`https://<machine>.<tailnet>.ts.net` address. Anyone with the link can read and
+post, because the chat has no login.

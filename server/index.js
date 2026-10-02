@@ -1,10 +1,37 @@
 const { randomUUID } = require('node:crypto');
+const fs = require('node:fs');
+const http = require('node:http');
+const path = require('node:path');
 const { WebSocketServer, WebSocket } = require('ws');
 const { openDb } = require('./db');
 
+// The same UI the Electron app uses, served so a plain browser (e.g. a phone)
+// can join the chat too.
+const STATIC_FILES = {
+  '/': ['index.html', 'text/html'],
+  '/index.html': ['index.html', 'text/html'],
+  '/renderer.js': ['renderer.js', 'text/javascript'],
+  '/styles.css': ['styles.css', 'text/css'],
+};
+
+function serveStatic(req, res) {
+  const file = STATIC_FILES[new URL(req.url, 'http://localhost').pathname];
+  if (!file) {
+    res.writeHead(404).end('Not found');
+    return;
+  }
+  const [name, type] = file;
+  fs.readFile(path.join(__dirname, '..', name), (err, data) => {
+    if (err) res.writeHead(500).end('Server error');
+    else res.writeHead(200, { 'Content-Type': `${type}; charset=utf-8` }).end(data);
+  });
+}
+
 function startServer({ port = 8080, dbFile } = {}) {
   const db = openDb(dbFile);
-  const wss = new WebSocketServer({ port });
+  const httpServer = http.createServer(serveStatic);
+  const wss = new WebSocketServer({ server: httpServer });
+  const listening = new Promise((resolve) => httpServer.listen(port, resolve));
   let closing = false;
 
   const send = (ws, msg) => {
@@ -47,14 +74,18 @@ function startServer({ port = 8080, dbFile } = {}) {
   return {
     wss,
     db,
+    listening,
+    port: () => httpServer.address().port,
     close: () =>
       new Promise((resolve) => {
         closing = true;
         db.closeAllConnections();
         wss.clients.forEach((ws) => ws.terminate());
         wss.close(() => {
-          db.close();
-          resolve();
+          httpServer.close(() => {
+            db.close();
+            resolve();
+          });
         });
       }),
   };
@@ -63,7 +94,7 @@ function startServer({ port = 8080, dbFile } = {}) {
 if (require.main === module) {
   const port = Number(process.env.PORT) || 8080;
   startServer({ port });
-  console.log(`Chat server listening on ws://localhost:${port}`);
+  console.log(`Chat server listening on http://localhost:${port} (WebSocket on the same port)`);
 }
 
 module.exports = { startServer };

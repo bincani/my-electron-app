@@ -28,7 +28,13 @@ test('stores connections and pushes chat to all connected clients', async (t) =>
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'chat-'));
   const server = startServer({ port: 0, dbFile: path.join(dir, 'test.db') });
   t.after(() => server.close());
-  const { port } = server.wss.address();
+  await server.listening;
+  const port = server.port();
+
+  const page = await fetch(`http://localhost:${port}/`);
+  assert.strictEqual(page.status, 200);
+  assert.match(await page.text(), /id="composer"/);
+  assert.strictEqual((await fetch(`http://localhost:${port}/server/db.js`)).status, 404);
 
   const alice = client(port, 'alice');
   await alice.next('welcome');
