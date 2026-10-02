@@ -23,7 +23,12 @@ function setUsers(users) {
 }
 
 function connect(username) {
-  const url = `${window.chatConfig.serverUrl}?username=${encodeURIComponent(username)}`;
+  // Electron passes the server URL in via the preload script; in a browser the
+  // page was served by the chat server itself, so connect back to it.
+  const base =
+    window.chatConfig?.serverUrl ??
+    `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
+  const url = `${base}?username=${encodeURIComponent(username)}`;
   ws = new WebSocket(url);
 
   ws.onopen = () => {
